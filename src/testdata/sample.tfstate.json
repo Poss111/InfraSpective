@@ -1,0 +1,155 @@
+{
+  "version": 4,
+  "terraform_version": "1.7.5",
+  "serial": 42,
+  "lineage": "sample-local-only-lineage",
+  "outputs": {
+    "web_url": {
+      "value": "https://example.internal",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "vpc-123",
+            "cidr_block": "10.0.0.0/16",
+            "tags": {
+              "Name": "main-vpc",
+              "Owner": "platform",
+              "Environment": "demo"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "module": "module.network",
+      "instances": [
+        {
+          "index_key": 0,
+          "attributes": {
+            "id": "subnet-123",
+            "cidr_block": "10.0.1.0/24",
+            "tags": {
+              "Name": "public-a",
+              "team": "platform",
+              "env": "demo"
+            }
+          },
+          "dependencies": ["aws_vpc.main"]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "web",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "module": "module.network",
+      "instances": [
+        {
+          "attributes": {
+            "id": "sg-123",
+            "name": "web",
+            "ingress": [
+              {
+                "from_port": 80,
+                "to_port": 80,
+                "protocol": "tcp",
+                "cidr_blocks": ["0.0.0.0/0"]
+              }
+            ],
+            "tags": {
+              "Name": "web-sg"
+            }
+          },
+          "dependencies": ["aws_vpc.main"]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "server",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "module": "module.app",
+      "instances": [
+        {
+          "index_key": 0,
+          "attributes": {
+            "id": "i-123",
+            "instance_type": "t3.micro",
+            "private_key": "super-secret-demo-value",
+            "tags": {
+              "Name": "web-0",
+              "Owner": "app-team"
+            }
+          },
+          "dependencies": [
+            "module.network.aws_subnet.public[0]",
+            "module.network.aws_security_group.web",
+            "data.aws_ami.ubuntu"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "demo-logs-bucket",
+            "bucket": "demo-logs-bucket"
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "service",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "api",
+          "attributes": {
+            "id": "service-api",
+            "name": "service-api",
+            "tags_all": {
+              "Owner": "security",
+              "Environment": "demo"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "aws_ami",
+      "name": "ubuntu",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "ami-123",
+            "name": "ubuntu/images/hvm-ssd"
+          }
+        }
+      ]
+    }
+  ]
+}

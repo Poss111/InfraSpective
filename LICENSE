@@ -1,0 +1,86 @@
+InfraSpective Source Available License
+Version 1.0
+
+Copyright (c) 2026 Poss111
+
+This license governs the InfraSpective application source code, documentation,
+branding, and original assets in this repository, except for third-party
+components listed in THIRD_PARTY_NOTICES.md or otherwise marked with their own
+license.
+
+1. Permitted Use
+
+You may:
+
+- View, read, and study the source code.
+- Run InfraSpective locally for personal use, educational use, evaluation, and
+  internal non-commercial use.
+- Modify the source code for personal use, educational use, evaluation, and
+  internal non-commercial use.
+- Make a reasonable number of copies for backup, testing, and internal
+  evaluation.
+
+2. Restricted Use
+
+Without prior written permission from the copyright holder, you may not:
+
+- Sell, rent, lease, sublicense, or commercially redistribute InfraSpective.
+- Offer InfraSpective, a modified version of InfraSpective, or a substantially
+  similar hosted service to third parties.
+- Use InfraSpective as part of a paid product, paid service, consulting
+  deliverable, managed service, marketplace listing, or white-label offering.
+- Remove, obscure, or alter copyright notices, license notices, attribution, or
+  author links.
+- Use the InfraSpective name, logo, or branding in a way that implies
+  endorsement, partnership, or ownership.
+
+3. Commercial Licensing
+
+Commercial use, commercial redistribution, hosted service use, white-label use,
+and team or enterprise use require a separate commercial license from Poss111.
+
+To request commercial terms, contact the project owner through:
+
+https://github.com/Poss111
+
+4. Contributions
+
+Unless a separate written agreement says otherwise, any contribution submitted
+to this project is licensed to the project owner under terms that allow the
+project owner to use, modify, distribute, sublicense, and commercially license
+the contribution as part of InfraSpective.
+
+5. Third-Party Software
+
+Third-party open source packages are licensed under their respective licenses.
+This license does not replace, modify, or restrict rights granted by those
+third-party licenses. See THIRD_PARTY_NOTICES.md for a summary of known
+third-party dependencies and license types.
+
+6. No Warranty
+
+INFRASPECTIVE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+Terraform state and plan files may contain sensitive data. You are responsible
+for deciding whether InfraSpective is appropriate for your environment and for
+reviewing all outputs before relying on them.
+
+7. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER SHALL NOT BE LIABLE
+FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM OR RELATED TO THE USE,
+INABILITY TO USE, MODIFICATION, DISTRIBUTION, OR OTHER DEALINGS IN
+INFRASPECTIVE.
+
+8. Termination
+
+Any rights granted by this license terminate automatically if you violate its
+terms. Upon termination, you must stop using, copying, modifying, distributing,
+or hosting InfraSpective.
+
+9. Reservation of Rights
+
+All rights not expressly granted in this license are reserved by the copyright
+holder.
