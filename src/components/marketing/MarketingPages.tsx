@@ -154,6 +154,12 @@ function PrivacyPage() {
             raw attributes, resource addresses, diffs, secrets, or selected resource details to analytics.
           </p>
         </Section>
+        <Section title="Advertising">
+          <p>
+            If Google AdSense is configured, ads may be shown on public marketing and documentation pages. The AdSense
+            script is not loaded on the `/app` tool route where Terraform state and plan files are parsed.
+          </p>
+        </Section>
       </Article>
     </MarketingShell>
   );

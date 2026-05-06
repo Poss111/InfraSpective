@@ -48,6 +48,29 @@ VITE_ANALYTICS_DEBUG=true
 Then redeploy and check the browser console for `[InfraSpective analytics]`
 messages. Turn it back off after confirming events are being sent.
 
+## Ads
+
+Google AdSense is disabled unless an AdSense publisher client ID is provided.
+
+For hosted deployment, set:
+
+```bash
+VITE_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXXXXXXXX
+```
+
+The AdSense script is loaded only on public marketing and documentation routes.
+It is intentionally not loaded on `/app`, where users parse Terraform state and
+plan files.
+
+For deployment debugging, temporarily set:
+
+```bash
+VITE_ADSENSE_DEBUG=true
+```
+
+Then redeploy and check the browser console for `[InfraSpective adsense]`
+messages. Turn it back off after confirming the script is loading.
+
 ## Checks
 
 ```bash

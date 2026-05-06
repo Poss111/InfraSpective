@@ -6,6 +6,7 @@ import { PlanDashboard } from '../components/plan/PlanDashboard';
 import { StateUploader } from '../components/upload/StateUploader';
 import { MarketingPages } from '../components/marketing/MarketingPages';
 import { initAnalytics, trackPageView } from '../analytics/googleAnalytics';
+import { initAdsense } from '../ads/googleAdsense';
 import { useInfraStore } from '../state/useInfraStore';
 
 export function App() {
@@ -18,6 +19,7 @@ export function App() {
 
   useEffect(() => {
     initAnalytics();
+    initAdsense(path);
     trackPageView(path);
   }, [path]);
 
