@@ -2,6 +2,7 @@ import { ArrowRight, FileJson, Github, LockKeyhole, Network, ShieldCheck, Upload
 import type { PlanAction } from '../../types/plan';
 import { actionBadgeClass } from '../plan/PlanNode';
 import { cn } from '../../lib/cn';
+import { trackEvent } from '../../analytics/googleAnalytics';
 
 type MarketingPage =
   | 'home'
@@ -145,6 +146,14 @@ function PrivacyPage() {
             sensitive-looking keys such as passwords, tokens, private keys, credentials, and certificates in the UI.
           </p>
         </Section>
+        <Section title="Usage analytics">
+          <p>
+            If Google Analytics is configured for the hosted site, InfraSpective may collect page views and high-level
+            interaction events such as switching upload modes, loading a demo, parsing success, parsing errors, and
+            aggregate resource or plan-change counts. InfraSpective does not send Terraform file names, file contents,
+            raw attributes, resource addresses, diffs, secrets, or selected resource details to analytics.
+          </p>
+        </Section>
       </Article>
     </MarketingShell>
   );
@@ -251,7 +260,11 @@ function Pill({ children }: { children: React.ReactNode }) {
 
 function PrimaryLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-slate-950" href={href}>
+    <a
+      className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-slate-950"
+      href={href}
+      onClick={() => trackEvent('marketing_cta_click', { target: href })}
+    >
       {children}
       <ArrowRight className="h-4 w-4" aria-hidden />
     </a>
@@ -260,7 +273,11 @@ function PrimaryLink({ href, children }: { href: string; children: React.ReactNo
 
 function SecondaryLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-panel" href={href}>
+    <a
+      className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-panel"
+      href={href}
+      onClick={() => trackEvent('marketing_cta_click', { target: href })}
+    >
       {children}
     </a>
   );

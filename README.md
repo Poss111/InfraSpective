@@ -20,6 +20,20 @@ npm install
 npm run dev
 ```
 
+## Analytics
+
+Google Analytics is disabled unless a GA4 measurement ID is provided.
+
+For local development or hosted deployment, set:
+
+```bash
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+InfraSpective only tracks page views and high-level interaction events. It does
+not send Terraform file names, file contents, resource addresses, raw
+attributes, diffs, or secrets to analytics.
+
 ## Checks
 
 ```bash

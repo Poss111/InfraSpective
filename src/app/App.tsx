@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import sampleState from '../testdata/sample.tfstate.json';
 import samplePlan from '../testdata/sample.plan.json';
 import { Dashboard } from '../components/layout/Dashboard';
 import { PlanDashboard } from '../components/plan/PlanDashboard';
 import { StateUploader } from '../components/upload/StateUploader';
 import { MarketingPages } from '../components/marketing/MarketingPages';
+import { initAnalytics, trackPageView } from '../analytics/googleAnalytics';
 import { useInfraStore } from '../state/useInfraStore';
 
 export function App() {
@@ -13,6 +15,11 @@ export function App() {
   const planChangeCount = useInfraStore((store) => store.planChanges.length);
   const loadStateJson = useInfraStore((store) => store.loadStateJson);
   const loadPlanJson = useInfraStore((store) => store.loadPlanJson);
+
+  useEffect(() => {
+    initAnalytics();
+    trackPageView(path);
+  }, [path]);
 
   if (activeView === 'plan' && planChangeCount > 0) {
     return <PlanDashboard />;

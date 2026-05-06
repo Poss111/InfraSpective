@@ -8,6 +8,7 @@ import { buildPlanGraph } from '../domain/graph/buildPlanGraph';
 import { detectFindings } from '../domain/findings/detectFindings';
 import { parseTerraformPlan, toPlanResourceChanges } from '../domain/terraform/parseTerraformPlan';
 import { parseTerraformState, toInfraResources } from '../domain/terraform/parseTerraformState';
+import { trackEvent } from '../analytics/googleAnalytics';
 
 export type ModeFilter = 'all' | 'managed' | 'data';
 
@@ -86,6 +87,16 @@ export const useInfraStore = create<InfraStore>((set) => ({
       const resources = toInfraResources(state);
       const graph = buildGraph(resources);
       const findings = detectFindings(graph.nodes, graph.edges);
+      const providers = new Set(resources.map((resource) => resource.provider).filter(Boolean)).size;
+      const modules = new Set(resources.map((resource) => resource.module).filter(Boolean)).size;
+
+      trackEvent('state_parse_success', {
+        resource_count: graph.nodes.length,
+        edge_count: graph.edges.length,
+        finding_count: findings.length,
+        provider_count: providers,
+        module_count: modules,
+      });
 
       set({
         activeView: 'state',
@@ -103,6 +114,7 @@ export const useInfraStore = create<InfraStore>((set) => ({
         planFilters: defaultPlanFilters,
       });
     } catch (error) {
+      trackEvent('parse_error', { upload_mode: 'state' });
       set({
         error: error instanceof Error ? error.message : 'Unable to parse this state file.',
       });
@@ -113,6 +125,13 @@ export const useInfraStore = create<InfraStore>((set) => ({
       const plan = parseTerraformPlan(json);
       const changes = toPlanResourceChanges(plan);
       const graph = buildPlanGraph(changes);
+      trackEvent('plan_parse_success', {
+        change_count: changes.length,
+        create_count: changes.filter((change) => change.action === 'create').length,
+        update_count: changes.filter((change) => change.action === 'update').length,
+        delete_count: changes.filter((change) => change.action === 'delete').length,
+        replace_count: changes.filter((change) => change.action === 'replace').length,
+      });
 
       set({
         activeView: 'plan',
@@ -130,6 +149,7 @@ export const useInfraStore = create<InfraStore>((set) => ({
         planFilters: defaultPlanFilters,
       });
     } catch (error) {
+      trackEvent('parse_error', { upload_mode: 'plan' });
       set({
         error: error instanceof Error ? error.message : 'Unable to parse this plan file.',
       });

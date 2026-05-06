@@ -2,6 +2,7 @@ import { ChangeEvent, DragEvent, useRef, useState } from 'react';
 import { AlertTriangle, Eye, FileJson, Github, HardDrive, LockKeyhole, ShieldCheck, Upload, WifiOff } from 'lucide-react';
 import { useInfraStore } from '../../state/useInfraStore';
 import { cn } from '../../lib/cn';
+import { trackEvent } from '../../analytics/googleAnalytics';
 import type { UploadMode } from '../../state/useInfraStore';
 
 type StateUploaderProps = {
@@ -22,6 +23,7 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
     try {
       const text = await file.text();
       const json = JSON.parse(text);
+      trackEvent('file_selected', { upload_mode: uploadMode });
       if (uploadMode === 'plan') {
         onLoadPlan(json);
       } else {
@@ -87,7 +89,10 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
                 'rounded px-3 py-2 text-sm font-semibold',
                 uploadMode === 'state' ? 'bg-accent text-slate-950' : 'text-slate-300 hover:bg-panelMuted',
               )}
-              onClick={() => setUploadMode('state')}
+              onClick={() => {
+                setUploadMode('state');
+                trackEvent('upload_mode_changed', { upload_mode: 'state' });
+              }}
               type="button"
             >
               State file
@@ -97,7 +102,10 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
                 'rounded px-3 py-2 text-sm font-semibold',
                 uploadMode === 'plan' ? 'bg-accent text-slate-950' : 'text-slate-300 hover:bg-panelMuted',
               )}
-              onClick={() => setUploadMode('plan')}
+              onClick={() => {
+                setUploadMode('plan');
+                trackEvent('upload_mode_changed', { upload_mode: 'plan' });
+              }}
               type="button"
             >
               Plan JSON
@@ -141,7 +149,14 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
               </button>
               <button
                 className="rounded-md border border-borderSoft px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-panel"
-                onClick={uploadMode === 'plan' ? onLoadDemoPlan : onLoadDemoState}
+                onClick={() => {
+                  trackEvent('demo_loaded', { upload_mode: uploadMode });
+                  if (uploadMode === 'plan') {
+                    onLoadDemoPlan();
+                  } else {
+                    onLoadDemoState();
+                  }
+                }}
                 type="button"
               >
                 {uploadMode === 'plan' ? 'Load demo plan' : 'Load demo state'}
