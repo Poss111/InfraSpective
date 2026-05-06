@@ -39,6 +39,15 @@ parameters such as `button_id`, `area`, `upload_mode`, `action`, and resource
 type/mode. The app intentionally avoids sending resource addresses or file
 details.
 
+For deployment debugging, temporarily set:
+
+```bash
+VITE_ANALYTICS_DEBUG=true
+```
+
+Then redeploy and check the browser console for `[InfraSpective analytics]`
+messages. Turn it back off after confirming events are being sent.
+
 ## Checks
 
 ```bash
