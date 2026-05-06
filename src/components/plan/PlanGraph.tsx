@@ -11,6 +11,7 @@ import {
 } from '@xyflow/react';
 import type { PlanEdge, PlanResourceChange } from '../../types/plan';
 import { layoutGraph } from '../../domain/graph/layoutGraph';
+import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
 import { PlanNode, type PlanNodeData } from './PlanNode';
 
@@ -62,7 +63,14 @@ function PlanGraphInner({ changes, edges }: PlanGraphProps) {
     <div className="relative h-full min-h-[420px] bg-[#0d1114]">
       <div className="absolute left-3 top-3 z-10 flex items-center gap-2 rounded-md border border-borderSoft bg-panel/95 px-3 py-2 text-xs text-slate-300 shadow-lg">
         <span>{changes.length} changes</span>
-        <button className="rounded border border-borderSoft px-2 py-1 hover:bg-panelMuted" onClick={() => fitView()} type="button">
+        <button
+          className="rounded border border-borderSoft px-2 py-1 hover:bg-panelMuted"
+          onClick={() => {
+            trackButtonClick('fit_plan_graph', { area: 'plan_graph' });
+            fitView();
+          }}
+          type="button"
+        >
           Fit
         </button>
       </div>

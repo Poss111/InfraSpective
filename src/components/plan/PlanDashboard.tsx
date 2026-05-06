@@ -1,5 +1,6 @@
 import { FileJson, Github, Plus, RefreshCw, RotateCw, Trash2, XCircle } from 'lucide-react';
 import { filterPlanChanges, filterPlanEdges } from '../../domain/filtering/filterPlanChanges';
+import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
 import type { PlanAction, PlanResourceChange } from '../../types/plan';
 import { PlanChangeDetailsPanel } from './PlanChangeDetailsPanel';
@@ -37,7 +38,10 @@ export function PlanDashboard() {
           </div>
           <button
             className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
-            onClick={clear}
+            onClick={() => {
+              trackButtonClick('clear_plan', { area: 'plan_dashboard' });
+              clear();
+            }}
             type="button"
           >
             <Trash2 className="h-4 w-4" aria-hidden />

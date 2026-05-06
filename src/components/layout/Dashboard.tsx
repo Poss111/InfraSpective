@@ -1,6 +1,7 @@
 import { AlertTriangle, Database, FileOutput, Github, Network, ShieldAlert, Trash2 } from 'lucide-react';
 import { filterEdges, filterResources } from '../../domain/filtering/filterResources';
 import { useInfraStore } from '../../state/useInfraStore';
+import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { ResourceGraph } from '../graph/ResourceGraph';
 import { ResourceDetailsPanel } from '../details/ResourceDetailsPanel';
 import { ResourceInventory } from '../inventory/ResourceInventory';
@@ -42,7 +43,10 @@ export function Dashboard() {
           </div>
           <button
             className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
-            onClick={clear}
+            onClick={() => {
+              trackButtonClick('clear_state', { area: 'state_dashboard' });
+              clear();
+            }}
             type="button"
           >
             <Trash2 className="h-4 w-4" aria-hidden />

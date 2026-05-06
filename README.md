@@ -34,6 +34,11 @@ InfraSpective only tracks page views and high-level interaction events. It does
 not send Terraform file names, file contents, resource addresses, raw
 attributes, diffs, or secrets to analytics.
 
+Button interactions are tracked with the GA event name `button_click` and safe
+parameters such as `button_id`, `area`, `upload_mode`, `action`, and resource
+type/mode. The app intentionally avoids sending resource addresses or file
+details.
+
 ## Checks
 
 ```bash

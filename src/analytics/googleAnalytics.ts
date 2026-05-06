@@ -57,6 +57,16 @@ export function trackEvent(name: string, parameters: Record<string, string | num
   window.gtag?.('event', name, cleanParameters(parameters));
 }
 
+export function trackButtonClick(
+  buttonId: string,
+  parameters: Record<string, string | number | boolean | undefined> = {},
+): void {
+  trackEvent('button_click', {
+    button_id: buttonId,
+    ...parameters,
+  });
+}
+
 function cleanParameters(parameters: Record<string, string | number | boolean | undefined>): Record<string, string | number | boolean> {
   return Object.fromEntries(Object.entries(parameters).filter((entry): entry is [string, string | number | boolean] => entry[1] !== undefined));
 }

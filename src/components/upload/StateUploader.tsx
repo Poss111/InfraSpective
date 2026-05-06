@@ -2,7 +2,7 @@ import { ChangeEvent, DragEvent, useRef, useState } from 'react';
 import { AlertTriangle, Eye, FileJson, Github, HardDrive, LockKeyhole, ShieldCheck, Upload, WifiOff } from 'lucide-react';
 import { useInfraStore } from '../../state/useInfraStore';
 import { cn } from '../../lib/cn';
-import { trackEvent } from '../../analytics/googleAnalytics';
+import { trackButtonClick, trackEvent } from '../../analytics/googleAnalytics';
 import type { UploadMode } from '../../state/useInfraStore';
 
 type StateUploaderProps = {
@@ -91,6 +91,7 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
               )}
               onClick={() => {
                 setUploadMode('state');
+                trackButtonClick('upload_mode_state', { area: 'upload' });
                 trackEvent('upload_mode_changed', { upload_mode: 'state' });
               }}
               type="button"
@@ -104,6 +105,7 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
               )}
               onClick={() => {
                 setUploadMode('plan');
+                trackButtonClick('upload_mode_plan', { area: 'upload' });
                 trackEvent('upload_mode_changed', { upload_mode: 'plan' });
               }}
               type="button"
@@ -141,7 +143,10 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <button
                 className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-slate-950"
-                onClick={() => inputRef.current?.click()}
+                onClick={() => {
+                  trackButtonClick('choose_file', { area: 'upload', upload_mode: uploadMode });
+                  inputRef.current?.click();
+                }}
                 type="button"
               >
                 <Upload className="h-4 w-4" aria-hidden />
@@ -150,6 +155,10 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
               <button
                 className="rounded-md border border-borderSoft px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-panel"
                 onClick={() => {
+                  trackButtonClick(uploadMode === 'plan' ? 'load_demo_plan' : 'load_demo_state', {
+                    area: 'upload',
+                    upload_mode: uploadMode,
+                  });
                   trackEvent('demo_loaded', { upload_mode: uploadMode });
                   if (uploadMode === 'plan') {
                     onLoadDemoPlan();

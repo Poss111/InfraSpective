@@ -1,5 +1,6 @@
 import type { Finding } from '../../types/findings';
 import type { InfraResource } from '../../types/infra';
+import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { cn } from '../../lib/cn';
 import { useInfraStore } from '../../state/useInfraStore';
 
@@ -30,7 +31,14 @@ export function ResourceInventory({ resources, findings }: ResourceInventoryProp
                   'w-full rounded-md border px-3 py-2 text-left text-sm hover:bg-panelMuted',
                   selectedResourceId === resource.id ? 'border-accent bg-accent/10' : 'border-transparent bg-transparent',
                 )}
-                onClick={() => selectResource(resource.id)}
+                onClick={() => {
+                  trackButtonClick('select_state_resource', {
+                    area: 'state_inventory',
+                    resource_type: resource.type,
+                    resource_mode: resource.mode,
+                  });
+                  selectResource(resource.id);
+                }}
                 type="button"
               >
                 <div className="flex items-center gap-2">

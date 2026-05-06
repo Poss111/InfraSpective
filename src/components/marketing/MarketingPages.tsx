@@ -2,7 +2,7 @@ import { ArrowRight, FileJson, Github, LockKeyhole, Network, ShieldCheck, Upload
 import type { PlanAction } from '../../types/plan';
 import { actionBadgeClass } from '../plan/PlanNode';
 import { cn } from '../../lib/cn';
-import { trackEvent } from '../../analytics/googleAnalytics';
+import { trackButtonClick, trackEvent } from '../../analytics/googleAnalytics';
 
 type MarketingPage =
   | 'home'
@@ -263,7 +263,10 @@ function PrimaryLink({ href, children }: { href: string; children: React.ReactNo
     <a
       className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-slate-950"
       href={href}
-      onClick={() => trackEvent('marketing_cta_click', { target: href })}
+      onClick={() => {
+        trackButtonClick('marketing_primary_cta', { area: 'marketing', target: href });
+        trackEvent('marketing_cta_click', { target: href });
+      }}
     >
       {children}
       <ArrowRight className="h-4 w-4" aria-hidden />
@@ -276,7 +279,10 @@ function SecondaryLink({ href, children }: { href: string; children: React.React
     <a
       className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-panel"
       href={href}
-      onClick={() => trackEvent('marketing_cta_click', { target: href })}
+      onClick={() => {
+        trackButtonClick('marketing_secondary_cta', { area: 'marketing', target: href });
+        trackEvent('marketing_cta_click', { target: href });
+      }}
     >
       {children}
     </a>

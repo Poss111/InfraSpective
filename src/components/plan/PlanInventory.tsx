@@ -1,4 +1,5 @@
 import type { PlanResourceChange } from '../../types/plan';
+import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { cn } from '../../lib/cn';
 import { useInfraStore } from '../../state/useInfraStore';
 import { actionBadgeClass } from './PlanNode';
@@ -27,7 +28,15 @@ export function PlanInventory({ changes }: PlanInventoryProps) {
                 'w-full rounded-md border px-3 py-2 text-left text-sm hover:bg-panelMuted',
                 selectedPlanChangeId === change.id ? 'border-accent bg-accent/10' : 'border-transparent bg-transparent',
               )}
-              onClick={() => selectPlanChange(change.id)}
+              onClick={() => {
+                trackButtonClick('select_plan_change', {
+                  area: 'plan_inventory',
+                  action: change.action,
+                  resource_type: change.type,
+                  resource_mode: change.mode,
+                });
+                selectPlanChange(change.id);
+              }}
               type="button"
             >
               <div className="flex items-center gap-2">

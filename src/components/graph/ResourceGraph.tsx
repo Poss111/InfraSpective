@@ -12,6 +12,7 @@ import {
 import type { Finding } from '../../types/findings';
 import type { InfraEdge, InfraResource } from '../../types/infra';
 import { layoutGraph } from '../../domain/graph/layoutGraph';
+import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
 import { ResourceNode, type ResourceNodeData } from './ResourceNode';
 
@@ -76,7 +77,14 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
       <div className="absolute left-3 top-3 z-10 flex items-center gap-2 rounded-md border border-borderSoft bg-panel/95 px-3 py-2 text-xs text-slate-300 shadow-lg">
         <span>{resources.length} nodes</span>
         <span>{edges.length} edges</span>
-        <button className="rounded border border-borderSoft px-2 py-1 hover:bg-panelMuted" onClick={() => fitView()} type="button">
+        <button
+          className="rounded border border-borderSoft px-2 py-1 hover:bg-panelMuted"
+          onClick={() => {
+            trackButtonClick('fit_state_graph', { area: 'state_graph' });
+            fitView();
+          }}
+          type="button"
+        >
           Fit
         </button>
       </div>
