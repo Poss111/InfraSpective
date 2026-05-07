@@ -1,7 +1,8 @@
-import { FileJson, Github, Plus, RefreshCw, RotateCw, Trash2, XCircle } from 'lucide-react';
+import { FileJson, Github, Newspaper, Plus, RefreshCw, RotateCw, Trash2, XCircle } from 'lucide-react';
 import { filterPlanChanges, filterPlanEdges } from '../../domain/filtering/filterPlanChanges';
 import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
+import { currentAppVersion } from '../../content/changelog';
 import type { PlanAction, PlanResourceChange } from '../../types/plan';
 import { PlanChangeDetailsPanel } from './PlanChangeDetailsPanel';
 import { PlanFiltersPanel } from './PlanFiltersPanel';
@@ -36,17 +37,28 @@ export function PlanDashboard() {
               .
             </p>
           </div>
-          <button
-            className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
-            onClick={() => {
-              trackButtonClick('clear_plan', { area: 'plan_dashboard' });
-              clear();
-            }}
-            type="button"
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-            Clear plan
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <a
+              className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
+              href="/changelog"
+              onClick={() => trackButtonClick('open_changelog', { area: 'plan_dashboard' })}
+            >
+              <Newspaper className="h-4 w-4" aria-hidden />
+              What's new
+              <span className="text-xs text-slate-500">{currentAppVersion}</span>
+            </a>
+            <button
+              className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
+              onClick={() => {
+                trackButtonClick('clear_plan', { area: 'plan_dashboard' });
+                clear();
+              }}
+              type="button"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+              Clear plan
+            </button>
+          </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-6">
           <SummaryCard icon={<Plus />} label="Add" value={countAction(changes, 'create')} />

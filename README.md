@@ -20,6 +20,12 @@ npm install
 npm run dev
 ```
 
+## Version Updates
+
+InfraSpective release notes are maintained in `src/content/changelog.ts` and
+shown on the public `/changelog` route. Add a new changelog entry whenever a
+user-facing feature, fix, or security-relevant behavior changes.
+
 ## Analytics
 
 Google Analytics is implemented with `react-ga4` and disabled unless a GA4 measurement ID is provided.

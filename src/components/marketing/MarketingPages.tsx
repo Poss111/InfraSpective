@@ -1,15 +1,17 @@
-import { ArrowRight, FileJson, Github, LockKeyhole, Network, ShieldCheck, Upload, WifiOff } from 'lucide-react';
+import { ArrowRight, CalendarDays, FileJson, Github, LockKeyhole, Network, ShieldCheck, Upload, WifiOff } from 'lucide-react';
 import type { PlanAction } from '../../types/plan';
 import { actionBadgeClass } from '../plan/PlanNode';
 import { cn } from '../../lib/cn';
 import { trackButtonClick, trackEvent } from '../../analytics/googleAnalytics';
+import { changelog } from '../../content/changelog';
 
 type MarketingPage =
   | 'home'
   | 'state'
   | 'plan'
   | 'plan-json'
-  | 'privacy';
+  | 'privacy'
+  | 'changelog';
 
 type MarketingPagesProps = {
   page: MarketingPage;
@@ -20,6 +22,7 @@ export function MarketingPages({ page }: MarketingPagesProps) {
   if (page === 'plan') return <PlanVisualizerPage />;
   if (page === 'plan-json') return <PlanJsonGuidePage />;
   if (page === 'privacy') return <PrivacyPage />;
+  if (page === 'changelog') return <ChangelogPage />;
   return <HomePage />;
 }
 
@@ -165,6 +168,50 @@ function PrivacyPage() {
   );
 }
 
+function ChangelogPage() {
+  return (
+    <MarketingShell>
+      <Article
+        eyebrow="Changelog"
+        title="What changed in InfraSpective."
+        intro="Follow app updates by version, including new visualization capabilities, usability improvements, fixes, and security-relevant changes."
+      >
+        <div className="space-y-5">
+          {changelog.map((release) => (
+            <section key={release.version} className="rounded-md border border-borderSoft bg-panel/85 p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-borderSoft pb-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-100">
+                    {release.version}: {release.title}
+                  </h2>
+                  <div className="mt-2 inline-flex items-center gap-2 text-sm text-slate-400">
+                    <CalendarDays className="h-4 w-4 text-accent" aria-hidden />
+                    <time dateTime={release.date}>{formatReleaseDate(release.date)}</time>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {release.groups.map((group) => (
+                  <div key={group.category}>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-accent">{group.category}</h3>
+                    <ul className="mt-2 space-y-2 text-sm leading-6 text-slate-300">
+                      {group.items.map((item) => (
+                        <li key={item} className="border-l border-borderSoft pl-3">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </Article>
+    </MarketingShell>
+  );
+}
+
 function MarketingShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen overflow-hidden bg-background text-slate-100">
@@ -177,6 +224,7 @@ function MarketingShell({ children }: { children: React.ReactNode }) {
           <nav className="hidden items-center gap-5 text-sm text-slate-300 md:flex">
             <a className="hover:text-accent" href="/terraform-state-visualizer">State</a>
             <a className="hover:text-accent" href="/terraform-plan-visualizer">Plan</a>
+            <a className="hover:text-accent" href="/changelog">Changelog</a>
             <a className="hover:text-accent" href="/privacy">Privacy</a>
             <a className="inline-flex items-center gap-1 hover:text-accent" href="https://github.com/Poss111" rel="noreferrer" target="_blank">
               <Github className="h-4 w-4" aria-hidden />
@@ -191,6 +239,15 @@ function MarketingShell({ children }: { children: React.ReactNode }) {
       </div>
     </main>
   );
+}
+
+function formatReleaseDate(date: string): string {
+  return new Intl.DateTimeFormat('en', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${date}T00:00:00Z`));
 }
 
 function Article({ eyebrow, title, intro, children }: { eyebrow: string; title: string; intro: string; children: React.ReactNode }) {

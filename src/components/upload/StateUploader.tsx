@@ -1,9 +1,10 @@
 import { ChangeEvent, DragEvent, useRef, useState } from 'react';
-import { AlertTriangle, Eye, FileJson, Github, HardDrive, LockKeyhole, ShieldCheck, Upload, WifiOff } from 'lucide-react';
+import { AlertTriangle, Eye, FileJson, Github, HardDrive, LockKeyhole, Newspaper, ShieldCheck, Upload, WifiOff } from 'lucide-react';
 import { useInfraStore } from '../../state/useInfraStore';
 import { cn } from '../../lib/cn';
 import { trackButtonClick, trackEvent } from '../../analytics/googleAnalytics';
 import type { UploadMode } from '../../state/useInfraStore';
+import { currentAppVersion } from '../../content/changelog';
 
 type StateUploaderProps = {
   onLoadState: (json: unknown) => void;
@@ -181,18 +182,28 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
             </div>
           ) : null}
 
-          <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-slate-500">
-            Built by{' '}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1.5">
+              Built by{' '}
+              <a
+                className="inline-flex items-center gap-1 text-accent hover:underline"
+                href="https://github.com/Poss111"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <Github className="h-3.5 w-3.5" aria-hidden />
+                Poss111
+              </a>
+            </span>
             <a
               className="inline-flex items-center gap-1 text-accent hover:underline"
-              href="https://github.com/Poss111"
-              rel="noreferrer"
-              target="_blank"
+              href="/changelog"
+              onClick={() => trackButtonClick('open_changelog', { area: 'upload' })}
             >
-              <Github className="h-3.5 w-3.5" aria-hidden />
-              Poss111
+              <Newspaper className="h-3.5 w-3.5" aria-hidden />
+              What's new in {currentAppVersion}
             </a>
-          </p>
+          </div>
         </div>
       </section>
     </main>

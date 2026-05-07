@@ -58,6 +58,10 @@ export function App() {
     return <MarketingPages page="privacy" />;
   }
 
+  if (path === '/changelog') {
+    return <MarketingPages page="changelog" />;
+  }
+
   return <MarketingPages page="home" />;
 }
 

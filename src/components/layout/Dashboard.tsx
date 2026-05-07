@@ -1,7 +1,8 @@
-import { AlertTriangle, Database, FileOutput, Github, Network, ShieldAlert, Trash2 } from 'lucide-react';
+import { AlertTriangle, Database, FileOutput, Github, Network, Newspaper, ShieldAlert, Trash2 } from 'lucide-react';
 import { filterEdges, filterResources } from '../../domain/filtering/filterResources';
 import { useInfraStore } from '../../state/useInfraStore';
 import { trackButtonClick } from '../../analytics/googleAnalytics';
+import { currentAppVersion } from '../../content/changelog';
 import { ResourceGraph } from '../graph/ResourceGraph';
 import { ResourceDetailsPanel } from '../details/ResourceDetailsPanel';
 import { ResourceInventory } from '../inventory/ResourceInventory';
@@ -41,17 +42,28 @@ export function Dashboard() {
               .
             </p>
           </div>
-          <button
-            className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
-            onClick={() => {
-              trackButtonClick('clear_state', { area: 'state_dashboard' });
-              clear();
-            }}
-            type="button"
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-            Clear state
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <a
+              className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
+              href="/changelog"
+              onClick={() => trackButtonClick('open_changelog', { area: 'state_dashboard' })}
+            >
+              <Newspaper className="h-4 w-4" aria-hidden />
+              What's new
+              <span className="text-xs text-slate-500">{currentAppVersion}</span>
+            </a>
+            <button
+              className="inline-flex items-center gap-2 rounded-md border border-borderSoft px-3 py-2 text-sm text-slate-200 hover:bg-panelMuted"
+              onClick={() => {
+                trackButtonClick('clear_state', { area: 'state_dashboard' });
+                clear();
+              }}
+              type="button"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+              Clear state
+            </button>
+          </div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-5">
           <SummaryCard icon={<Database />} label="Resources" value={resources.length} />
