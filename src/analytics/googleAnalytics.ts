@@ -1,12 +1,7 @@
+import ReactGA from 'react-ga4';
+
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 const ANALYTICS_DEBUG = import.meta.env.VITE_ANALYTICS_DEBUG === 'true';
-
-declare global {
-  interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
-  }
-}
 
 let initialized = false;
 
@@ -20,25 +15,13 @@ export function initAnalytics(): void {
 
   initialized = true;
   debugAnalytics('initializing');
-  window.dataLayer = window.dataLayer ?? [];
-  window.gtag =
-    window.gtag ??
-    function gtag(...args: unknown[]) {
-      window.dataLayer?.push(args);
-    };
 
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  script.onload = () => debugAnalytics('script_loaded');
-  script.onerror = () => debugAnalytics('script_failed_to_load');
-  document.head.appendChild(script);
-
-  window.gtag('js', new Date());
-  window.gtag('config', GA_MEASUREMENT_ID, {
-    send_page_view: false,
-    allow_google_signals: false,
-    allow_ad_personalization_signals: false,
+  ReactGA.initialize(GA_MEASUREMENT_ID, {
+    gtagOptions: {
+      send_page_view: false,
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+    },
   });
 }
 
@@ -50,10 +33,10 @@ export function trackPageView(path: string, title = document.title): void {
 
   initAnalytics();
   debugAnalytics('page_view_sent', { path });
-  window.gtag?.('event', 'page_view', {
-    page_path: path,
-    page_location: window.location.href,
-    page_title: title,
+  ReactGA.send({
+    hitType: 'pageview',
+    page: path,
+    title,
   });
 }
 
@@ -66,7 +49,7 @@ export function trackEvent(name: string, parameters: Record<string, string | num
   initAnalytics();
   const cleaned = cleanParameters(parameters);
   debugAnalytics('event_sent', { event: name, ...cleaned });
-  window.gtag?.('event', name, cleaned);
+  ReactGA.event(name, cleaned);
 }
 
 export function trackButtonClick(

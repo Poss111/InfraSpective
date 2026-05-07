@@ -22,7 +22,7 @@ npm run dev
 
 ## Analytics
 
-Google Analytics is disabled unless a GA4 measurement ID is provided.
+Google Analytics is implemented with `react-ga4` and disabled unless a GA4 measurement ID is provided.
 
 For local development or hosted deployment, set:
 
