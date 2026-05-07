@@ -24,6 +24,7 @@ describe('App smoke flows', () => {
     expect(screen.getByRole('heading', { name: /What changed in InfraSpective/i })).toBeInTheDocument();
     const releaseHeadings = screen.getAllByRole('heading', { level: 2 });
     expect(releaseHeadings.map((heading) => heading.textContent)).toEqual([
+      '0.1.2: Safe graph exports',
       '0.1.1: Version updates',
       '0.1.0: Initial local-first release',
     ]);
@@ -37,6 +38,8 @@ describe('App smoke flows', () => {
     expect(await screen.findByText(/Inventory/i)).toBeInTheDocument();
     expect(screen.getByText('InfraSpective')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /what's new/i })).toHaveAttribute('href', '/changelog');
+    expect(screen.getByRole('button', { name: /export safe png/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /copy safe summary/i })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /clear state/i }));
 
@@ -54,6 +57,8 @@ describe('App smoke flows', () => {
     expect(screen.getByText('Add')).toBeInTheDocument();
     expect(screen.getByText('Modify')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /what's new/i })).toHaveAttribute('href', '/changelog');
+    expect(screen.getByRole('button', { name: /export safe png/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /copy safe summary/i })).toBeInTheDocument();
 
     const actionFilter = screen.getByLabelText(/Action/i);
     fireEvent.change(actionFilter, { target: { value: 'delete' } });

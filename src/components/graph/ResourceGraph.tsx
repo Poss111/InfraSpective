@@ -12,6 +12,7 @@ import {
 import type { Finding } from '../../types/findings';
 import type { InfraEdge, InfraResource } from '../../types/infra';
 import { layoutGraph } from '../../domain/graph/layoutGraph';
+import { buildStateSafeExport, copySafeExportText, countBucket, exportSafePng } from '../../domain/export/safeExport';
 import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
 import { ResourceNode, type ResourceNodeData } from './ResourceNode';
@@ -36,6 +37,7 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
   const selectedResourceId = useInfraStore((store) => store.selectedResourceId);
   const selectResource = useInfraStore((store) => store.selectResource);
   const { fitView } = useReactFlow();
+  const safeExport = useMemo(() => buildStateSafeExport(resources, edges, findings), [edges, findings, resources]);
 
   const graph = useMemo(() => {
     const connectedIds = new Set(
@@ -72,9 +74,16 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
     };
   }, [edges, findings, resources, selectedResourceId]);
 
+  const exportTelemetry = {
+    area: 'state_graph',
+    view: 'state',
+    node_count_bucket: countBucket(resources.length),
+    edge_count_bucket: countBucket(edges.length),
+  };
+
   return (
     <div className="relative h-full min-h-[420px] bg-[#0d1114]">
-      <div className="absolute left-3 top-3 z-10 flex items-center gap-2 rounded-md border border-borderSoft bg-panel/95 px-3 py-2 text-xs text-slate-300 shadow-lg">
+      <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-2 rounded-md border border-borderSoft bg-panel/95 px-3 py-2 text-xs text-slate-300 shadow-lg">
         <span>{resources.length} nodes</span>
         <span>{edges.length} edges</span>
         <button
@@ -86,6 +95,26 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
           type="button"
         >
           Fit
+        </button>
+        <button
+          className="rounded border border-borderSoft px-2 py-1 hover:bg-panelMuted"
+          onClick={() => {
+            trackButtonClick('export_safe_png', { ...exportTelemetry, export_type: 'png' });
+            void exportSafePng(safeExport, 'infraspective-state-graph.png');
+          }}
+          type="button"
+        >
+          Export safe PNG
+        </button>
+        <button
+          className="rounded border border-borderSoft px-2 py-1 hover:bg-panelMuted"
+          onClick={() => {
+            trackButtonClick('copy_safe_summary', { ...exportTelemetry, export_type: 'text' });
+            void copySafeExportText(safeExport, 'infraspective-state-summary.txt');
+          }}
+          type="button"
+        >
+          Copy safe summary
         </button>
       </div>
       <ReactFlow

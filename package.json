@@ -1,7 +1,7 @@
 {
   "name": "terraform-state-visualizer",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Poss111 <https://github.com/Poss111>",
   "type": "module",
   "scripts": {

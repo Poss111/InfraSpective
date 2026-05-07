@@ -93,6 +93,7 @@ Plan upload flow:
 - `src/domain/graph`: state/plan graph construction and Dagre layout.
 - `src/domain/findings`: lightweight findings detection.
 - `src/domain/filtering`: dashboard filter predicates.
+- `src/domain/export`: safe export builders and browser-only export helpers.
 - `src/domain/redaction`: sensitive key detection and recursive redaction.
 - `src/domain/resources`: resource type to Lucide icon mapping.
 - `src/state`: Zustand store and filter types.
@@ -142,6 +143,14 @@ Graph layout:
 - State graph edges come from Terraform state instance dependencies and are only created when both endpoints are parsed resources.
 - React Flow node rendering is split between `ResourceNode` and `PlanNode`.
 
+Safe exports:
+
+- Implementation: `src/domain/export/safeExport.ts`.
+- State and plan graph export controls build a sanitized export model from the currently visible/filtered nodes and edges.
+- Safe exports use generated aliases such as `Resource 001` and `Change 001`.
+- Do not screenshot or print the live React Flow dashboard for exports because the visible graph can contain Terraform addresses.
+- Exported PNG/text must not include file names, Terraform resource addresses, raw attributes, tags, diffs, IDs, secrets, or other infrastructure-identifying details.
+
 ## UI Notes
 
 - The app uses a dark operational dashboard style.
@@ -151,6 +160,7 @@ Graph layout:
 - If changing graph layout or node sizing, check both `ResourceGraph` and `PlanGraph`; both use `layoutGraph`.
 - If adding filter fields, update the store filter type/defaults, filter panel UI, and filter predicate together.
 - If adding plan action types, update `PlanAction`, `detectPlanAction`, plan filters, summary cards, node styling, and tests.
+- If changing export behavior, preserve sanitized-by-default output and test that known addresses and sensitive sample values are absent from generated artifacts.
 
 ## Analytics And Ads
 
@@ -189,6 +199,7 @@ Add or update tests when touching:
 - Finding rules.
 - Filter behavior.
 - Store orchestration for loaded state/plan.
+- Safe export summaries and generated export text/SVG.
 
 Primary commands before handoff:
 
@@ -238,3 +249,10 @@ Adding a new app version update:
 2. Keep release notes concise and user-facing, grouped by Added, Improved, Fixed, or Security.
 3. Do not include Terraform file names, resource addresses, raw attributes, diffs, secrets, or other user infrastructure-identifying details in release notes.
 4. Confirm `/changelog`, the upload screen, and loaded state/plan dashboards still render their update links.
+
+Changing safe export behavior:
+
+1. Start in `src/domain/export/safeExport.ts`.
+2. Keep export artifacts generated from the safe export model, not from live dashboard screenshots.
+3. Preserve generated aliases for node labels unless the user explicitly opts into a future detailed export mode with warnings.
+4. Add tests that generated text/SVG do not contain sample resource addresses, raw values, diffs, or secret-looking values.

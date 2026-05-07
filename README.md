@@ -26,6 +26,13 @@ InfraSpective release notes are maintained in `src/content/changelog.ts` and
 shown on the public `/changelog` route. Add a new changelog entry whenever a
 user-facing feature, fix, or security-relevant behavior changes.
 
+## Safe Exports
+
+State and plan graphs can export a sanitized PNG or copy a safe text summary.
+Exports are generated from aliases such as `Resource 001` and `Change 001`
+rather than live dashboard screenshots, so Terraform addresses, raw attributes,
+diff values, file names, and secrets are not included by default.
+
 ## Analytics
 
 Google Analytics is implemented with `react-ga4` and disabled unless a GA4 measurement ID is provided.

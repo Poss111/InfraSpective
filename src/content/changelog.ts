@@ -12,6 +12,26 @@ export type ChangelogRelease = {
 
 export const changelog: ChangelogRelease[] = [
   {
+    version: '0.1.2',
+    date: '2026-05-07',
+    title: 'Safe graph exports',
+    groups: [
+      {
+        category: 'Added',
+        items: [
+          'Added sanitized PNG export controls for state and plan graph views.',
+          'Added safe text summary copy actions for current filtered state and plan views.',
+        ],
+      },
+      {
+        category: 'Security',
+        items: [
+          'Safe exports use generated aliases instead of Terraform addresses, raw attributes, diffs, file names, or secret values.',
+        ],
+      },
+    ],
+  },
+  {
     version: '0.1.1',
     date: '2026-05-06',
     title: 'Version updates',
