@@ -9,29 +9,45 @@ import { currentAppVersion } from '../../content/changelog';
 type StateUploaderProps = {
   onLoadState: (json: unknown) => void;
   onLoadPlan: (json: unknown) => void;
+  onLoadKnowledgeFiles: (files: { name: string; contents: string }[]) => void;
+  onLoadDemoKnowledge: () => void;
   onLoadDemoState: () => void;
   onLoadDemoPlan: () => void;
 };
 
-export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoadDemoPlan }: StateUploaderProps) {
+export function StateUploader({
+  onLoadState,
+  onLoadPlan,
+  onLoadKnowledgeFiles,
+  onLoadDemoKnowledge,
+  onLoadDemoState,
+  onLoadDemoPlan,
+}: StateUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [uploadMode, setUploadMode] = useState<UploadMode>('state');
+  const [uploadMode, setUploadMode] = useState<UploadMode>('knowledge');
   const error = useInfraStore((store) => store.error);
 
-  async function readFile(file?: File) {
-    if (!file) return;
+  async function readFiles(fileList?: FileList | null) {
+    const files = [...(fileList ?? [])];
+    if (!files.length) return;
     try {
-      const text = await file.text();
-      const json = JSON.parse(text);
       trackEvent('file_selected', { upload_mode: uploadMode });
+      if (uploadMode === 'knowledge') {
+        const graphFiles = await Promise.all(files.map(async (file) => ({ name: file.name, contents: await file.text() })));
+        onLoadKnowledgeFiles(graphFiles);
+        return;
+      }
+
+      const text = await files[0].text();
+      const json = JSON.parse(text);
       if (uploadMode === 'plan') {
         onLoadPlan(json);
       } else {
         onLoadState(json);
       }
     } catch {
-      useInfraStore.setState({ error: 'This file is not valid JSON.' });
+      useInfraStore.setState({ error: uploadMode === 'knowledge' ? 'These files could not be parsed.' : 'This file is not valid JSON.' });
     } finally {
       if (inputRef.current) inputRef.current.value = '';
     }
@@ -40,11 +56,11 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
     setDragActive(false);
-    void readFile(event.dataTransfer.files[0]);
+    void readFiles(event.dataTransfer.files);
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    void readFile(event.target.files?.[0]);
+    void readFiles(event.target.files);
   }
 
   return (
@@ -54,11 +70,11 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
         <div className="max-w-2xl">
           <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-accent">
             <ShieldCheck className="h-4 w-4" aria-hidden />
-            Local-first state intelligence
+            Local-first infrastructure intelligence
           </div>
           <h1 className="text-5xl font-semibold tracking-normal text-slate-50 sm:text-6xl">InfraSpective</h1>
           <p className="mt-4 max-w-xl text-lg leading-8 text-slate-300">
-            See Terraform state and plan changes clearly, without sending sensitive infrastructure data anywhere.
+            Build a normalized infrastructure graph from Terraform, Kubernetes, and Helm files without sending sensitive data anywhere.
           </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
@@ -76,15 +92,29 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
               </div>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-              <MiniMetric label="State" value="Graph" />
-              <MiniMetric label="Plan" value="Diff" />
-              <MiniMetric label="Secrets" value="Masked" />
+            <MiniMetric label="Graph" value="Unified" />
+            <MiniMetric label="Sources" value="Local" />
+            <MiniMetric label="Secrets" value="Masked" />
             </div>
           </div>
         </div>
 
         <div className="rounded-lg border border-borderSoft bg-panel p-5 shadow-2xl">
-          <div className="mb-4 grid grid-cols-2 gap-2 rounded-md border border-borderSoft bg-background p-1">
+          <div className="mb-4 grid grid-cols-3 gap-2 rounded-md border border-borderSoft bg-background p-1">
+            <button
+              className={cn(
+                'rounded px-3 py-2 text-sm font-semibold',
+                uploadMode === 'knowledge' ? 'bg-accent text-slate-950' : 'text-slate-300 hover:bg-panelMuted',
+              )}
+              onClick={() => {
+                setUploadMode('knowledge');
+                trackButtonClick('upload_mode_knowledge', { area: 'upload' });
+                trackEvent('upload_mode_changed', { upload_mode: 'knowledge' });
+              }}
+              type="button"
+            >
+              Graph
+            </button>
             <button
               className={cn(
                 'rounded px-3 py-2 text-sm font-semibold',
@@ -128,8 +158,12 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
             onDrop={handleDrop}
           >
             <FileJson className="mb-4 h-12 w-12 text-accent" aria-hidden />
-            <h2 className="text-xl font-semibold">{uploadMode === 'plan' ? 'Upload Terraform plan JSON' : 'Upload terraform.tfstate'}</h2>
-            {uploadMode === 'plan' ? (
+            <h2 className="text-xl font-semibold">{headingFor(uploadMode)}</h2>
+            {uploadMode === 'knowledge' ? (
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">
+                Select one or more Terraform JSON, Kubernetes YAML, or Helm-rendered manifest files to build a local infrastructure knowledge graph.
+              </p>
+            ) : uploadMode === 'plan' ? (
               <div className="mt-2 max-w-xl text-sm leading-6 text-slate-300">
                 <p>Generate plan JSON locally, then inspect the proposed creates, updates, deletes, and replacements here.</p>
                 <pre className="mt-3 rounded-md border border-borderSoft bg-background p-3 text-left font-mono text-xs leading-5 text-slate-300">
@@ -161,7 +195,9 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
                     upload_mode: uploadMode,
                   });
                   trackEvent('demo_loaded', { upload_mode: uploadMode });
-                  if (uploadMode === 'plan') {
+                  if (uploadMode === 'knowledge') {
+                    onLoadDemoKnowledge();
+                  } else if (uploadMode === 'plan') {
                     onLoadDemoPlan();
                   } else {
                     onLoadDemoState();
@@ -169,10 +205,17 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
                 }}
                 type="button"
               >
-                {uploadMode === 'plan' ? 'Load demo plan' : 'Load demo state'}
+                {demoLabelFor(uploadMode)}
               </button>
             </div>
-            <input ref={inputRef} className="hidden" type="file" accept=".json,.tfstate,application/json" onChange={handleFileChange} />
+            <input
+              ref={inputRef}
+              className="hidden"
+              type="file"
+              multiple={uploadMode === 'knowledge'}
+              accept=".json,.tfstate,.yaml,.yml,application/json,text/yaml,application/yaml"
+              onChange={handleFileChange}
+            />
           </div>
 
           {error ? (
@@ -208,6 +251,18 @@ export function StateUploader({ onLoadState, onLoadPlan, onLoadDemoState, onLoad
       </section>
     </main>
   );
+}
+
+function headingFor(uploadMode: UploadMode): string {
+  if (uploadMode === 'knowledge') return 'Build an infrastructure graph';
+  if (uploadMode === 'plan') return 'Upload Terraform plan JSON';
+  return 'Upload terraform.tfstate';
+}
+
+function demoLabelFor(uploadMode: UploadMode): string {
+  if (uploadMode === 'knowledge') return 'Load demo graph';
+  if (uploadMode === 'plan') return 'Load demo plan';
+  return 'Load demo state';
 }
 
 function TrustSignal({ icon, title, body }: { icon: React.ReactElement; title: string; body: string }) {

@@ -34,6 +34,7 @@ describe('App smoke flows', () => {
   it('loads demo state into the dashboard and clears it', async () => {
     render(<App />);
 
+    fireEvent.click(screen.getByRole('button', { name: /state file/i }));
     fireEvent.click(screen.getByRole('button', { name: /load demo state/i }));
 
     expect(await screen.findByText(/Inventory/i)).toBeInTheDocument();
@@ -44,7 +45,7 @@ describe('App smoke flows', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /clear state/i }));
 
-    expect(await screen.findByText(/Upload terraform\.tfstate/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Build an infrastructure graph/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /what's new in/i })).toHaveAttribute('href', '/changelog');
   });
 
@@ -70,6 +71,7 @@ describe('App smoke flows', () => {
 
   it('filters inventory by search text', async () => {
     render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /state file/i }));
     fireEvent.click(screen.getByRole('button', { name: /load demo state/i }));
 
     const search = await screen.findByPlaceholderText(/search address/i);
