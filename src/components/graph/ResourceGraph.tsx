@@ -15,9 +15,11 @@ import { layoutGraph } from '../../domain/graph/layoutGraph';
 import { buildStateSafeExport, copySafeExportText, countBucket, exportSafePng } from '../../domain/export/safeExport';
 import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
+import { buildProviderZoneNodes, type ProviderZoneData } from '../../domain/graph/providerZones';
+import { ProviderZoneNode } from './ProviderZoneNode';
 import { ResourceNode, type ResourceNodeData } from './ResourceNode';
 
-const nodeTypes = { resource: ResourceNode };
+const nodeTypes = { providerZone: ProviderZoneNode, resource: ResourceNode };
 
 type ResourceGraphProps = {
   resources: InfraResource[];
@@ -44,10 +46,11 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
       edges.flatMap((edge) => (edge.source === selectedResourceId || edge.target === selectedResourceId ? [edge.source, edge.target] : [])),
     );
 
-    const nodes: Node<ResourceNodeData>[] = resources.map((resource) => ({
+    const resourceNodes: Node<ResourceNodeData>[] = resources.map((resource) => ({
       id: resource.id,
       type: 'resource',
       position: { x: 0, y: 0 },
+      zIndex: 1,
       data: {
         resource,
         findings: findings.filter((finding) => finding.resourceId === resource.id),
@@ -68,8 +71,11 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
       };
     });
 
+    const layoutedResourceNodes = layoutGraph(resourceNodes, flowEdges);
+    const zoneNodes = buildProviderZoneNodes(layoutedResourceNodes);
+
     return {
-      nodes: layoutGraph(nodes, flowEdges),
+      nodes: [...zoneNodes, ...layoutedResourceNodes] as Node<ResourceNodeData | ProviderZoneData>[],
       edges: flowEdges,
     };
   }, [edges, findings, resources, selectedResourceId]);
@@ -83,7 +89,7 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
 
   return (
     <div className="relative h-full min-h-[420px] bg-[#0d1114]">
-      <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-2 rounded-md border border-borderSoft bg-panel/95 px-3 py-2 text-xs text-slate-300 shadow-lg">
+      <div className="absolute right-3 top-3 z-10 flex flex-wrap items-center gap-2 rounded-md border border-borderSoft bg-panel/95 px-3 py-2 text-xs text-slate-300 shadow-lg">
         <span>{resources.length} nodes</span>
         <span>{edges.length} edges</span>
         <button
@@ -123,7 +129,11 @@ function ResourceGraphInner({ resources, edges, findings }: ResourceGraphProps) 
         nodeTypes={nodeTypes}
         minZoom={0.15}
         fitView
-        onNodeClick={(_, node) => selectResource(node.id)}
+        onNodeClick={(_, node) => {
+          if (node.type === 'resource') {
+            selectResource(node.id);
+          }
+        }}
         onPaneClick={() => selectResource(undefined)}
       >
         <Background color="#2b343b" gap={18} />

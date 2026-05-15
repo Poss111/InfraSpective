@@ -12,6 +12,20 @@ export type ChangelogRelease = {
 
 export const changelog: ChangelogRelease[] = [
   {
+    version: '0.1.3',
+    date: '2026-05-14',
+    title: 'Provider zones',
+    groups: [
+      {
+        category: 'Added',
+        items: [
+          'Added provider zones around state graph resources with account and region labels.',
+          'Expanded the demo state with AWS and Google resources to show multi-provider grouping.',
+        ],
+      },
+    ],
+  },
+  {
     version: '0.1.2',
     date: '2026-05-07',
     title: 'Safe graph exports',

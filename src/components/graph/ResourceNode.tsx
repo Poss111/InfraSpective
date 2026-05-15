@@ -5,7 +5,7 @@ import type { InfraResource } from '../../types/infra';
 import { getResourceIcon } from '../../domain/resources/getResourceIcon';
 import { cn } from '../../lib/cn';
 
-export type ResourceNodeData = {
+export type ResourceNodeData = Record<string, unknown> & {
   resource: InfraResource;
   findings: Finding[];
   selected: boolean;

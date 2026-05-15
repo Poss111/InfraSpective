@@ -10,9 +10,11 @@ describe('parseTerraformState', () => {
     const resources = toInfraResources(parsed);
 
     expect(parsed.version).toBe(4);
-    expect(resources).toHaveLength(7);
+    expect(resources).toHaveLength(9);
     expect(resources.map((resource) => resource.address)).toContain('module.app.aws_instance.server[0]');
     expect(resources.map((resource) => resource.address)).toContain('aws_iam_role.service["api"]');
+    expect(resources.map((resource) => resource.provider)).toContain('hashicorp/google');
+    expect(resources.map((resource) => resource.address)).toContain('module.analytics.google_storage_bucket.exports');
   });
 
   it('rejects unsupported state shapes', () => {

@@ -24,6 +24,7 @@ describe('App smoke flows', () => {
     expect(screen.getByRole('heading', { name: /What changed in InfraSpective/i })).toBeInTheDocument();
     const releaseHeadings = screen.getAllByRole('heading', { level: 2 });
     expect(releaseHeadings.map((heading) => heading.textContent)).toEqual([
+      '0.1.3: Provider zones',
       '0.1.2: Safe graph exports',
       '0.1.1: Version updates',
       '0.1.0: Initial local-first release',

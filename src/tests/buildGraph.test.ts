@@ -8,9 +8,12 @@ describe('buildGraph', () => {
     const resources = toInfraResources(parseTerraformState(sampleState));
     const graph = buildGraph(resources);
 
-    expect(graph.nodes).toHaveLength(7);
+    expect(graph.nodes).toHaveLength(9);
     expect(graph.edges.map((edge) => edge.id)).toContain('aws_vpc.main->module.network.aws_subnet.public[0]');
     expect(graph.edges.map((edge) => edge.id)).toContain('data.aws_ami.ubuntu->module.app.aws_instance.server[0]');
+    expect(graph.edges.map((edge) => edge.id)).toContain(
+      'module.analytics.google_compute_network.analytics->module.analytics.google_storage_bucket.exports',
+    );
     expect(graph.edges.every((edge) => graph.nodes.some((node) => node.id === edge.source))).toBe(true);
     expect(graph.edges.every((edge) => graph.nodes.some((node) => node.id === edge.target))).toBe(true);
   });
