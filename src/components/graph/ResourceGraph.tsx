@@ -12,7 +12,8 @@ import {
 import type { Finding } from '../../types/findings';
 import type { InfraEdge, InfraResource } from '../../types/infra';
 import { layoutGraph } from '../../domain/graph/layoutGraph';
-import { buildStateSafeExport, copySafeExportText, countBucket, exportSafePng } from '../../domain/export/safeExport';
+import { buildStateSafeExport, countBucket } from '../../domain/export/safeExport';
+import { copySafeExportText, exportSafePng } from '../../domain/export/safeExportBrowser';
 import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
 import { buildProviderZoneNodes, type ProviderZoneData } from '../../domain/graph/providerZones';

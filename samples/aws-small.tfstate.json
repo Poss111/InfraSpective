@@ -1,0 +1,84 @@
+{
+  "version": 4,
+  "terraform_version": "1.7.5",
+  "serial": 7,
+  "lineage": "sample-aws-small-lineage",
+  "outputs": {
+    "app_url": {
+      "value": "https://app.example.test",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "vpc-0demo001",
+            "arn": "arn:aws:ec2:us-east-1:111122223333:vpc/vpc-0demo001",
+            "account_id": "111122223333",
+            "region": "us-east-1",
+            "cidr_block": "10.20.0.0/16",
+            "tags": {
+              "Name": "sample-small-vpc",
+              "Owner": "platform",
+              "Environment": "dev"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "attributes": {
+            "id": "subnet-0demo001",
+            "arn": "arn:aws:ec2:us-east-1:111122223333:subnet/subnet-0demo001",
+            "account_id": "111122223333",
+            "availability_zone": "us-east-1a",
+            "cidr_block": "10.20.1.0/24",
+            "tags": {
+              "Name": "sample-private-a",
+              "Owner": "platform",
+              "Environment": "dev"
+            }
+          },
+          "dependencies": ["aws_vpc.main"]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "api",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "i-0demo001",
+            "arn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0demo001",
+            "account_id": "111122223333",
+            "region": "us-east-1",
+            "instance_type": "t3.micro",
+            "private_ip": "10.20.1.15",
+            "tags": {
+              "Name": "sample-api",
+              "Owner": "app-team",
+              "Environment": "dev"
+            }
+          },
+          "dependencies": ["aws_subnet.private[0]"]
+        }
+      ]
+    }
+  ]
+}

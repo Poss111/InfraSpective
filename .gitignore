@@ -3,6 +3,7 @@ node_modules/
 
 # Build output
 dist/
+release/
 
 # Local environment files
 .env
@@ -23,6 +24,7 @@ pnpm-debug.log*
 # Test and tool caches
 coverage/
 .cache/
+.pkg-cache/
 .vite/
 *.tsbuildinfo
 
@@ -42,3 +44,5 @@ override.tf.json
 # Keep committed demo fixtures explicit.
 !sample.tfstate.json
 !src/testdata/sample.tfstate.json
+!samples/
+!samples/*.tfstate.json

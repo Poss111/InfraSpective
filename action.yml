@@ -1,0 +1,61 @@
+name: InfraSpective
+description: Generate sanitized Terraform state, plan, or infrastructure graph reports in CI.
+inputs:
+  files:
+    description: Newline- or comma-separated input file paths.
+    required: true
+  mode:
+    description: Analysis mode: auto, state, plan, or knowledge.
+    required: false
+    default: auto
+  format:
+    description: Report format: text, json, or svg.
+    required: false
+    default: text
+  fail-on:
+    description: Policy threshold: none, warning, or critical.
+    required: false
+    default: none
+  artifact-name:
+    description: Name for the uploaded sanitized report artifact. Leave empty to skip artifact upload.
+    required: false
+    default: infraspective-report
+  comment:
+    description: Write the sanitized report to the GitHub job summary.
+    required: false
+    default: 'true'
+outputs:
+  report-path:
+    description: Path to the generated sanitized report.
+    value: ${{ steps.analyze.outputs.report-path }}
+runs:
+  using: composite
+  steps:
+    - name: Install InfraSpective dependencies
+      shell: bash
+      run: cd "$GITHUB_ACTION_PATH" && npm ci
+    - name: Build InfraSpective CLI
+      shell: bash
+      run: cd "$GITHUB_ACTION_PATH" && npm run build:cli
+    - name: Analyze infrastructure files
+      id: analyze
+      continue-on-error: true
+      shell: bash
+      env:
+        INPUT_FILES: ${{ inputs.files }}
+        INPUT_MODE: ${{ inputs.mode }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        INPUT_COMMENT: ${{ inputs.comment }}
+        INFRASPECTIVE_REPORT_PATH: ${{ runner.temp }}/infraspective-report.${{ inputs.format == 'text' && 'txt' || inputs.format }}
+      run: node "$GITHUB_ACTION_PATH/scripts/github-action.mjs"
+    - name: Upload sanitized report artifact
+      if: ${{ inputs.artifact-name != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.analyze.outputs.report-path }}
+    - name: Propagate InfraSpective failure
+      if: ${{ steps.analyze.outcome == 'failure' }}
+      shell: bash
+      run: exit 1

@@ -73,6 +73,14 @@ export function App() {
     return <MarketingPages page="plan-json" />;
   }
 
+  if (path === '/docs/cli') {
+    return <MarketingPages page="cli" />;
+  }
+
+  if (path === '/docs/github-action') {
+    return <MarketingPages page="github-action" />;
+  }
+
   if (path === '/privacy') {
     return <MarketingPages page="privacy" />;
   }

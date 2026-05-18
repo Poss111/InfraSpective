@@ -1,15 +1,16 @@
 import type { Finding } from '../../types/findings';
 import type { InfraEdge, InfraResource } from '../../types/infra';
+import type { KnowledgeGraph } from '../../types/knowledge';
 import type { PlanEdge, PlanResourceChange } from '../../types/plan';
 
-export type SafeExportView = 'state' | 'plan';
+export type SafeExportView = 'state' | 'plan' | 'knowledge';
 
 export type SafeExportNode = {
   id: string;
   alias: string;
   kind: string;
   provider?: string;
-  mode: 'managed' | 'data';
+  mode: 'managed' | 'data' | 'entity';
   status?: string;
   countLabel?: string;
 };
@@ -102,6 +103,40 @@ export function buildPlanSafeExport(
   };
 }
 
+export function buildKnowledgeSafeExport(graph: KnowledgeGraph, generatedAt = new Date().toISOString()): SafeExportSummary {
+  const aliases = buildAliasMap(graph.entities.map((entity) => entity.id), 'Entity');
+  const safeEdges = mapSafeEdges(graph.relationships, aliases);
+  const insightCounts = countInsightsByEntity(graph);
+
+  return {
+    view: 'knowledge',
+    generatedAt,
+    nodes: graph.entities.map((entity) => {
+      const insightCount = insightCounts.get(entity.id) ?? 0;
+      return {
+        id: aliases.get(entity.id) ?? entity.id,
+        alias: aliases.get(entity.id) ?? 'Entity',
+        kind: entity.kind,
+        provider: entity.provider,
+        mode: 'entity',
+        status: highestKnowledgeSeverity(graph.insights.filter((insight) => insight.entityId === entity.id)),
+        countLabel: insightCount ? `${insightCount} insights` : undefined,
+      };
+    }),
+    edges: safeEdges,
+    totals: {
+      nodes: graph.entities.length,
+      edges: safeEdges.length,
+      sources: graph.sources.length,
+      insights: graph.insights.length,
+      criticalInsights: graph.insights.filter((insight) => insight.severity === 'critical').length,
+      warningInsights: graph.insights.filter((insight) => insight.severity === 'warning').length,
+      infoInsights: graph.insights.filter((insight) => insight.severity === 'info').length,
+      warnings: graph.warnings.length,
+    },
+  };
+}
+
 export function makeSafeExportText(summary: SafeExportSummary): string {
   const lines = [
     `InfraSpective safe ${summary.view} export`,
@@ -122,44 +157,6 @@ export function makeSafeExportText(summary: SafeExportSummary): string {
   }
 
   return `${lines.join('\n')}\n`;
-}
-
-export async function copySafeExportText(summary: SafeExportSummary, filename: string): Promise<'clipboard' | 'download'> {
-  const text = makeSafeExportText(summary);
-
-  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return 'clipboard';
-  }
-
-  downloadText(text, filename);
-  return 'download';
-}
-
-export async function exportSafePng(summary: SafeExportSummary, filename: string): Promise<void> {
-  const svg = renderSafeExportSvg(summary);
-  const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-
-  try {
-    const image = await loadImage(url);
-    const canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
-    const context = canvas.getContext('2d');
-
-    if (!context) {
-      throw new Error('PNG export is not supported in this browser.');
-    }
-
-    context.fillStyle = '#0d1114';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(image, 0, 0);
-    const pngUrl = canvas.toDataURL('image/png');
-    triggerDownload(pngUrl, filename);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
 }
 
 export function renderSafeExportSvg(summary: SafeExportSummary): string {
@@ -227,7 +224,7 @@ export function countBucket(count: number): string {
   return '101+';
 }
 
-function buildAliasMap(ids: string[], prefix: 'Resource' | 'Change'): Map<string, string> {
+function buildAliasMap(ids: string[], prefix: 'Resource' | 'Change' | 'Entity'): Map<string, string> {
   return new Map(ids.map((id, index) => [id, `${prefix} ${String(index + 1).padStart(3, '0')}`]));
 }
 
@@ -250,10 +247,28 @@ function countFindingsByResource(findings: Finding[]): Map<string, number> {
   return counts;
 }
 
+function countInsightsByEntity(graph: KnowledgeGraph): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const insight of graph.insights) {
+    if (!insight.entityId) {
+      continue;
+    }
+    counts.set(insight.entityId, (counts.get(insight.entityId) ?? 0) + 1);
+  }
+  return counts;
+}
+
 function highestSeverity(findings: Finding[]): string | undefined {
   if (findings.some((finding) => finding.severity === 'critical')) return 'critical';
   if (findings.some((finding) => finding.severity === 'warning')) return 'warning';
   if (findings.some((finding) => finding.severity === 'info')) return 'info';
+  return undefined;
+}
+
+function highestKnowledgeSeverity(insights: KnowledgeGraph['insights']): string | undefined {
+  if (insights.some((insight) => insight.severity === 'critical')) return 'critical';
+  if (insights.some((insight) => insight.severity === 'warning')) return 'warning';
+  if (insights.some((insight) => insight.severity === 'info')) return 'info';
   return undefined;
 }
 
@@ -278,32 +293,4 @@ function escapeXml(value: string): string {
     if (character === '"') return '&quot;';
     return '&apos;';
   });
-}
-
-function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error('Unable to render safe export image.'));
-    image.src = url;
-  });
-}
-
-function downloadText(text: string, filename: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-  try {
-    triggerDownload(url, filename);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
-
-function triggerDownload(url: string, filename: string): void {
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.rel = 'noreferrer';
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
 }

@@ -1,5 +1,5 @@
 import { ChangeEvent, DragEvent, useRef, useState } from 'react';
-import { AlertTriangle, Eye, FileJson, Github, HardDrive, LockKeyhole, Newspaper, ShieldCheck, Upload, WifiOff } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Eye, FileJson, Github, HardDrive, LockKeyhole, Newspaper, ShieldCheck, Terminal, Upload, WifiOff } from 'lucide-react';
 import { useInfraStore } from '../../state/useInfraStore';
 import { cn } from '../../lib/cn';
 import { trackButtonClick, trackEvent } from '../../analytics/googleAnalytics';
@@ -95,6 +95,36 @@ export function StateUploader({
             <MiniMetric label="Graph" value="Unified" />
             <MiniMetric label="Sources" value="Local" />
             <MiniMetric label="Secrets" value="Masked" />
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-md border border-accent/35 bg-accent/10 p-4">
+            <div className="flex items-start gap-3">
+              <Terminal className="mt-0.5 h-5 w-5 flex-none text-accent" aria-hidden />
+              <div>
+                <div className="text-sm font-semibold text-slate-100">Now available for CLI and CI</div>
+                <p className="mt-1 text-sm leading-6 text-slate-300">
+                  Run the same sanitized analysis on a local machine or in GitHub Actions without uploading Terraform data.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                  <a
+                    className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
+                    href="/docs/cli"
+                    onClick={() => trackButtonClick('open_cli_docs', { area: 'upload_announcement' })}
+                  >
+                    CLI docs
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                  </a>
+                  <a
+                    className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
+                    href="/docs/github-action"
+                    onClick={() => trackButtonClick('open_github_action_docs', { area: 'upload_announcement' })}
+                  >
+                    GitHub Action
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>

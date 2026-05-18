@@ -1,0 +1,120 @@
+{
+  "version": 4,
+  "terraform_version": "1.6.6",
+  "serial": 31,
+  "lineage": "sample-edge-cases-lineage",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "untagged_logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "sample-untagged-logs",
+            "account_id": "333344445555",
+            "region": "us-east-2",
+            "bucket": "sample-untagged-logs"
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "primary",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "sample-db-primary",
+            "arn": "arn:aws:rds:us-east-2:333344445555:db:sample-db-primary",
+            "account_id": "333344445555",
+            "region": "us-east-2",
+            "engine": "postgres",
+            "username": "demo_user",
+            "password": "fake-password-for-redaction-tests",
+            "tags": {
+              "Name": "sample-db-primary",
+              "Owner": "data-platform"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "public_ssh",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "sg-0publicssh",
+            "account_id": "333344445555",
+            "region": "us-east-2",
+            "name": "sample-public-ssh",
+            "ingress": [
+              {
+                "from_port": 22,
+                "to_port": 22,
+                "protocol": "tcp",
+                "cidr_blocks": ["0.0.0.0/0"]
+              }
+            ],
+            "tags": {
+              "Name": "sample-public-ssh",
+              "Owner": "security",
+              "Environment": "test"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_access_key",
+      "name": "automation",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "ci",
+          "attributes": {
+            "id": "AKIAIOSFODNN7EXAMPLE",
+            "account_id": "333344445555",
+            "region": "us-east-2",
+            "user": "sample-automation",
+            "secret": "fake-access-key-secret-for-redaction-tests",
+            "tags": {
+              "Owner": "platform",
+              "Environment": "test"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "random_id",
+      "name": "suffix",
+      "provider": "provider[\"registry.terraform.io/hashicorp/random\"]"
+    },
+    {
+      "mode": "data",
+      "type": "aws_caller_identity",
+      "name": "current",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "attributes": {
+            "id": "333344445555",
+            "account_id": "333344445555",
+            "region": "us-east-2"
+          }
+        }
+      ]
+    }
+  ]
+}

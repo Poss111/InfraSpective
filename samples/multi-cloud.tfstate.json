@@ -1,0 +1,160 @@
+{
+  "version": 4,
+  "terraform_version": "1.8.4",
+  "serial": 18,
+  "lineage": "sample-multi-cloud-lineage",
+  "outputs": {
+    "asset_bucket": {
+      "value": "sample-assets-example",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "edge",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "module": "module.edge",
+      "instances": [
+        {
+          "attributes": {
+            "id": "vpc-0edge001",
+            "arn": "arn:aws:ec2:us-west-2:222233334444:vpc/vpc-0edge001",
+            "account_id": "222233334444",
+            "region": "us-west-2",
+            "cidr_block": "10.40.0.0/16",
+            "tags_all": {
+              "Name": "sample-edge-vpc",
+              "team": "network",
+              "env": "stage"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "ingress",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "module": "module.edge",
+      "instances": [
+        {
+          "attributes": {
+            "id": "sg-0edge001",
+            "arn": "arn:aws:ec2:us-west-2:222233334444:security-group/sg-0edge001",
+            "account_id": "222233334444",
+            "region": "us-west-2",
+            "name": "sample-ingress",
+            "ingress": [
+              {
+                "from_port": 443,
+                "to_port": 443,
+                "protocol": "tcp",
+                "cidr_blocks": ["203.0.113.0/24"]
+              }
+            ],
+            "tags": {
+              "Name": "sample-ingress",
+              "Owner": "network",
+              "Environment": "stage"
+            }
+          },
+          "dependencies": ["module.edge.aws_vpc.edge"]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_compute_network",
+      "name": "data",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "module": "module.analytics",
+      "instances": [
+        {
+          "attributes": {
+            "id": "projects/sample-data/global/networks/sample-data",
+            "name": "sample-data",
+            "project": "sample-data",
+            "project_id": "sample-data",
+            "region": "us-central1",
+            "auto_create_subnetworks": false,
+            "labels": {
+              "team": "analytics",
+              "environment": "stage"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "google_storage_bucket",
+      "name": "exports",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "module": "module.analytics",
+      "instances": [
+        {
+          "attributes": {
+            "id": "sample-data-exports",
+            "name": "sample-data-exports",
+            "project_id": "sample-data",
+            "region": "us-central1",
+            "location": "US",
+            "uniform_bucket_level_access": true,
+            "labels": {
+              "team": "analytics",
+              "environment": "stage"
+            }
+          },
+          "dependencies": ["module.analytics.google_compute_network.data"]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_resource_group",
+      "name": "ops",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "module": "module.operations",
+      "instances": [
+        {
+          "attributes": {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/sample-ops",
+            "subscription_id": "00000000-0000-0000-0000-000000000000",
+            "name": "sample-ops",
+            "location": "eastus",
+            "tags": {
+              "Owner": "operations",
+              "Environment": "stage"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "azurerm_storage_account",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
+      "module": "module.operations",
+      "instances": [
+        {
+          "attributes": {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/sample-ops/providers/Microsoft.Storage/storageAccounts/sampleopslogs",
+            "subscription_id": "00000000-0000-0000-0000-000000000000",
+            "name": "sampleopslogs",
+            "location": "eastus",
+            "account_tier": "Standard",
+            "tags": {
+              "Owner": "operations",
+              "Environment": "stage"
+            }
+          },
+          "dependencies": ["module.operations.azurerm_resource_group.ops"]
+        }
+      ]
+    }
+  ]
+}

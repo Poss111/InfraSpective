@@ -12,6 +12,27 @@ export type ChangelogRelease = {
 
 export const changelog: ChangelogRelease[] = [
   {
+    version: '0.1.4',
+    date: '2026-05-17',
+    title: 'CLI and CI workflows',
+    groups: [
+      {
+        category: 'Added',
+        items: [
+          'Added an InfraSpective CLI for running sanitized Terraform state, plan, and infrastructure graph reports on local machines.',
+          'Added GitHub Action support for generating safe CI report artifacts from Terraform and infrastructure files.',
+          'Added standalone CLI binary packaging for macOS, Linux, and Windows release assets.',
+        ],
+      },
+      {
+        category: 'Security',
+        items: [
+          'CLI and CI reports use generated aliases and omit file names, Terraform addresses, raw attributes, diffs, and secret-looking values.',
+        ],
+      },
+    ],
+  },
+  {
     version: '0.1.3',
     date: '2026-05-14',
     title: 'Provider zones',

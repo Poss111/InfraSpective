@@ -1,0 +1,50 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    name: Test, build, and smoke test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build web app and CLI
+        run: npm run build
+
+      - name: Build pkg-compatible CLI bundle
+        run: npm run build:pkg
+
+      - name: Smoke test Node CLI
+        run: |
+          node dist/cli/infraspective.js analyze samples/aws-small.tfstate.json --mode state --format text
+          node dist/cli/infraspective.js analyze samples/multi-cloud.tfstate.json --mode state --format json --out /tmp/infraspective-multi-cloud.json
+          node dist/pkg/infraspective.cjs analyze samples/edge-cases.tfstate.json --mode state --format text --fail-on none
+
+      - name: Verify sanitized CLI output
+        run: |
+          node dist/cli/infraspective.js analyze samples/edge-cases.tfstate.json --mode state --format text > /tmp/infraspective-edge-cases.txt
+          grep -q "Resource 001" /tmp/infraspective-edge-cases.txt
+          ! grep -q "fake-password-for-redaction-tests" /tmp/infraspective-edge-cases.txt
+          ! grep -q "fake-access-key-secret-for-redaction-tests" /tmp/infraspective-edge-cases.txt

@@ -11,7 +11,8 @@ import {
 } from '@xyflow/react';
 import type { PlanEdge, PlanResourceChange } from '../../types/plan';
 import { layoutGraph } from '../../domain/graph/layoutGraph';
-import { buildPlanSafeExport, copySafeExportText, countBucket, exportSafePng } from '../../domain/export/safeExport';
+import { buildPlanSafeExport, countBucket } from '../../domain/export/safeExport';
+import { copySafeExportText, exportSafePng } from '../../domain/export/safeExportBrowser';
 import { trackButtonClick } from '../../analytics/googleAnalytics';
 import { useInfraStore } from '../../state/useInfraStore';
 import { PlanNode, type PlanNodeData } from './PlanNode';

@@ -8,7 +8,8 @@
     "moduleResolution": "Bundler",
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "types": ["node"],
     "noEmit": true
   },
-  "include": ["vite.config.ts", "vitest.setup.ts"]
+  "include": ["vite.config.ts", "vite.cli.config.ts", "vite.pkg.config.ts", "vitest.setup.ts", "src/cli/**/*.ts"]
 }

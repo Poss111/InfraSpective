@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, FileJson, Github, LockKeyhole, Network, ShieldCheck, Upload, WifiOff } from 'lucide-react';
+import { ArrowRight, CalendarDays, Github, LockKeyhole, Network, ShieldCheck, WifiOff } from 'lucide-react';
 import type { PlanAction } from '../../types/plan';
 import { actionBadgeClass } from '../plan/PlanNode';
 import { cn } from '../../lib/cn';
@@ -10,6 +10,8 @@ type MarketingPage =
   | 'state'
   | 'plan'
   | 'plan-json'
+  | 'cli'
+  | 'github-action'
   | 'privacy'
   | 'changelog';
 
@@ -21,6 +23,8 @@ export function MarketingPages({ page }: MarketingPagesProps) {
   if (page === 'state') return <StateVisualizerPage />;
   if (page === 'plan') return <PlanVisualizerPage />;
   if (page === 'plan-json') return <PlanJsonGuidePage />;
+  if (page === 'cli') return <CliDocsPage />;
+  if (page === 'github-action') return <GithubActionDocsPage />;
   if (page === 'privacy') return <PrivacyPage />;
   if (page === 'changelog') return <ChangelogPage />;
   return <HomePage />;
@@ -129,6 +133,88 @@ function PlanJsonGuidePage() {
   );
 }
 
+function CliDocsPage() {
+  return (
+    <MarketingShell>
+      <Article
+        eyebrow="CLI"
+        title="Run InfraSpective from your terminal."
+        intro="The InfraSpective CLI uses the same local parser as the browser app and emits sanitized reports with generated aliases instead of Terraform addresses, raw attributes, diffs, file names, or secrets."
+      >
+        <Section title="Analyze a plan">
+          <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
+            npm run build:cli{'\n'}node dist/cli/infraspective.js analyze plan.json --mode plan --format text
+          </pre>
+        </Section>
+        <Section title="Write safe artifacts">
+          <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
+            node dist/cli/infraspective.js analyze terraform.tfstate --mode state --format json --out infraspective-report.json{'\n'}
+            node dist/cli/infraspective.js analyze plan.json --mode plan --format svg --out infraspective-report.svg
+          </pre>
+        </Section>
+        <Section title="Policy threshold">
+          <p>
+            Use <code className="font-mono text-slate-100">--fail-on warning</code> or{' '}
+            <code className="font-mono text-slate-100">--fail-on critical</code> when a CI job should fail on sanitized
+            findings or risky plan action counts.
+          </p>
+        </Section>
+        <PrimaryLink href="/docs/github-action">Use the GitHub Action</PrimaryLink>
+      </Article>
+    </MarketingShell>
+  );
+}
+
+function GithubActionDocsPage() {
+  return (
+    <MarketingShell>
+      <Article
+        eyebrow="GitHub Action"
+        title="Generate sanitized infrastructure reports in CI."
+        intro="The GitHub Action wraps the InfraSpective CLI for pull request and workflow checks. It uploads sanitized report artifacts and can write a safe job summary for reviewers."
+      >
+        <Section title="Workflow example">
+          <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
+            name: InfraSpective{'\n'}
+            on: [pull_request]{'\n\n'}
+            jobs:{'\n'}
+            {'  '}review-plan:{'\n'}
+            {'    '}runs-on: ubuntu-latest{'\n'}
+            {'    '}steps:{'\n'}
+            {'      '}- uses: actions/checkout@v4{'\n'}
+            {'      '}- uses: Poss111/terraform-state-visualizer@main{'\n'}
+            {'        '}with:{'\n'}
+            {'          '}files: plan.json{'\n'}
+            {'          '}mode: plan{'\n'}
+            {'          '}format: text{'\n'}
+            {'          '}fail-on: warning
+          </pre>
+        </Section>
+        <Section title="Multiple sources">
+          <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
+            with:{'\n'}
+            {'  '}files: |{'\n'}
+            {'    '}terraform.tfstate{'\n'}
+            {'    '}plan.json{'\n'}
+            {'    '}kubernetes.yaml{'\n'}
+            {'  '}mode: knowledge{'\n'}
+            {'  '}format: json{'\n'}
+            {'  '}artifact-name: infraspective-graph
+          </pre>
+        </Section>
+        <Section title="Privacy model">
+          <p>
+            Action outputs use the safe export model only. Reports include aliases, counts, resource kinds, providers,
+            action categories, and finding totals, while omitting file names, Terraform addresses, raw values, diffs,
+            and secret-looking content.
+          </p>
+        </Section>
+        <PrimaryLink href="/docs/cli">Read CLI docs</PrimaryLink>
+      </Article>
+    </MarketingShell>
+  );
+}
+
 function PrivacyPage() {
   return (
     <MarketingShell>
@@ -224,6 +310,8 @@ function MarketingShell({ children }: { children: React.ReactNode }) {
           <nav className="hidden items-center gap-5 text-sm text-slate-300 md:flex">
             <a className="hover:text-accent" href="/terraform-state-visualizer">State</a>
             <a className="hover:text-accent" href="/terraform-plan-visualizer">Plan</a>
+            <a className="hover:text-accent" href="/docs/cli">CLI</a>
+            <a className="hover:text-accent" href="/docs/github-action">Action</a>
             <a className="hover:text-accent" href="/changelog">Changelog</a>
             <a className="hover:text-accent" href="/privacy">Privacy</a>
             <a className="inline-flex items-center gap-1 hover:text-accent" href="https://github.com/Poss111" rel="noreferrer" target="_blank">

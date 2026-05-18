@@ -4,9 +4,16 @@
   "version": "0.1.2",
   "author": "Poss111 <https://github.com/Poss111>",
   "type": "module",
+  "bin": {
+    "infraspective": "./dist/cli/infraspective.js"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --config vite.cli.config.ts",
+    "build:cli": "tsc -b tsconfig.node.json && vite build --config vite.cli.config.ts",
+    "build:pkg": "tsc -b tsconfig.node.json && vite build --config vite.pkg.config.ts",
+    "package:cli": "npm run build:pkg && node scripts/package-cli.mjs",
+    "build:all": "npm run build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -32,6 +39,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "@yao-pkg/pkg": "^6.19.0",
     "autoprefixer": "^10.4.20",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
