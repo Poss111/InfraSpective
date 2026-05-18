@@ -134,6 +134,8 @@ function PlanJsonGuidePage() {
 }
 
 function CliDocsPage() {
+  const releaseUrl = 'https://github.com/Poss111/InfraSpective/releases/tag/v0.1.4';
+
   return (
     <MarketingShell>
       <Article
@@ -141,15 +143,24 @@ function CliDocsPage() {
         title="Run InfraSpective from your terminal."
         intro="The InfraSpective CLI uses the same local parser as the browser app and emits sanitized reports with generated aliases instead of Terraform addresses, raw attributes, diffs, file names, or secrets."
       >
+        <Section title="Download">
+          <p>
+            Download the latest standalone binary from{' '}
+            <a className="font-semibold text-accent hover:underline" href={releaseUrl} rel="noreferrer" target="_blank">
+              Poss111/InfraSpective releases
+            </a>
+            . Choose the macOS, Linux, or Windows asset for your machine.
+          </p>
+        </Section>
         <Section title="Analyze a plan">
           <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
-            npm run build:cli{'\n'}node dist/cli/infraspective.js analyze plan.json --mode plan --format text
+            ./infraspective-macos-arm64 analyze plan.json --mode plan --format text
           </pre>
         </Section>
         <Section title="Write safe artifacts">
           <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
-            node dist/cli/infraspective.js analyze terraform.tfstate --mode state --format json --out infraspective-report.json{'\n'}
-            node dist/cli/infraspective.js analyze plan.json --mode plan --format svg --out infraspective-report.svg
+            ./infraspective-linux-x64 analyze terraform.tfstate --mode state --format json --out infraspective-report.json{'\n'}
+            ./infraspective-linux-x64 analyze plan.json --mode plan --format svg --out infraspective-report.svg
           </pre>
         </Section>
         <Section title="Policy threshold">
@@ -159,7 +170,7 @@ function CliDocsPage() {
             findings or risky plan action counts.
           </p>
         </Section>
-        <PrimaryLink href="/docs/github-action">Use the GitHub Action</PrimaryLink>
+        <SecondaryLink href="/docs/github-action">GitHub Action docs TBA</SecondaryLink>
       </Article>
     </MarketingShell>
   );
@@ -170,36 +181,12 @@ function GithubActionDocsPage() {
     <MarketingShell>
       <Article
         eyebrow="GitHub Action"
-        title="Generate sanitized infrastructure reports in CI."
-        intro="The GitHub Action wraps the InfraSpective CLI for pull request and workflow checks. It uploads sanitized report artifacts and can write a safe job summary for reviewers."
+        title="GitHub Action support is TBA."
+        intro="A first-party GitHub Action workflow is planned for CI report artifacts and pull request checks. For now, use the standalone CLI binary in your own CI scripts."
       >
-        <Section title="Workflow example">
+        <Section title="Current CI option">
           <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
-            name: InfraSpective{'\n'}
-            on: [pull_request]{'\n\n'}
-            jobs:{'\n'}
-            {'  '}review-plan:{'\n'}
-            {'    '}runs-on: ubuntu-latest{'\n'}
-            {'    '}steps:{'\n'}
-            {'      '}- uses: actions/checkout@v4{'\n'}
-            {'      '}- uses: Poss111/terraform-state-visualizer@main{'\n'}
-            {'        '}with:{'\n'}
-            {'          '}files: plan.json{'\n'}
-            {'          '}mode: plan{'\n'}
-            {'          '}format: text{'\n'}
-            {'          '}fail-on: warning
-          </pre>
-        </Section>
-        <Section title="Multiple sources">
-          <pre className="overflow-auto rounded-md border border-borderSoft bg-background p-4 font-mono text-sm leading-6 text-slate-200">
-            with:{'\n'}
-            {'  '}files: |{'\n'}
-            {'    '}terraform.tfstate{'\n'}
-            {'    '}plan.json{'\n'}
-            {'    '}kubernetes.yaml{'\n'}
-            {'  '}mode: knowledge{'\n'}
-            {'  '}format: json{'\n'}
-            {'  '}artifact-name: infraspective-graph
+            ./infraspective-linux-x64 analyze plan.json --mode plan --format text --fail-on warning
           </pre>
         </Section>
         <Section title="Privacy model">
@@ -311,7 +298,7 @@ function MarketingShell({ children }: { children: React.ReactNode }) {
             <a className="hover:text-accent" href="/terraform-state-visualizer">State</a>
             <a className="hover:text-accent" href="/terraform-plan-visualizer">Plan</a>
             <a className="hover:text-accent" href="/docs/cli">CLI</a>
-            <a className="hover:text-accent" href="/docs/github-action">Action</a>
+            <a className="hover:text-accent" href="/docs/github-action">Action TBA</a>
             <a className="hover:text-accent" href="/changelog">Changelog</a>
             <a className="hover:text-accent" href="/privacy">Privacy</a>
             <a className="inline-flex items-center gap-1 hover:text-accent" href="https://github.com/Poss111" rel="noreferrer" target="_blank">

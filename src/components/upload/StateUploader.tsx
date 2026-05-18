@@ -120,7 +120,7 @@ export function StateUploader({
                     href="/docs/github-action"
                     onClick={() => trackButtonClick('open_github_action_docs', { area: 'upload_announcement' })}
                   >
-                    GitHub Action
+                    GitHub Action TBA
                     <ArrowRight className="h-3.5 w-3.5" aria-hidden />
                   </a>
                 </div>
